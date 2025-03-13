@@ -72,8 +72,8 @@ const Payments = () => {
                     : payment?.courseId?.title}
                 </TableCell>
                 <TableCell>{payment.quizId ? 'Quiz' : 'Course'}</TableCell>
-                <TableCell>{payment.userId.mobile}</TableCell>
-                <TableCell>₹{payment.amount / 100}</TableCell>
+                <TableCell>{payment?.userId?.mobile}</TableCell>
+                <TableCell>₹{payment?.amount / 100}</TableCell>
                 <TableCell>
                   <div className="flex flex-col items-start">
                     <span>
@@ -94,7 +94,7 @@ const Payments = () => {
                         : 'bg-red-100 text-red-800'
                     }`}
                   >
-                    {payment.paymentStatus}
+                    {payment?.paymentStatus}
                   </span>
                 </TableCell>
               </TableRow>

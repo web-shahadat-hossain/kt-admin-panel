@@ -21,6 +21,8 @@ import {
   User2,
   BookMarked,
   Percent,
+  IndianRupee,
+  Video,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -71,8 +73,14 @@ const DashboardLayout = () => {
     },
     { icon: BookOpen, label: 'Quiz Management', path: '/dashboard/quiz' },
     { icon: CreditCard, label: 'Payments', path: '/dashboard/payments' },
-    { icon: CreditCard, label: 'Transactions', path: '/dashboard/transaction' },
+    {
+      icon: IndianRupee,
+      label: 'Transactions',
+      path: '/dashboard/transaction',
+    },
     { icon: Percent, label: 'Manage Offers', path: '/dashboard/offer' },
+    { icon: Video, label: 'Upcoming Live', path: '/dashboard/upcomingLive' },
+    { icon: Video, label: ' Live', path: '/dashboard/live' },
     // { icon: Settings, label: "Settings", path: "/dashboard/settings" },
   ];
 

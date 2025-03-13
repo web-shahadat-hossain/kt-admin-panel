@@ -19,6 +19,8 @@ import { OfferPage } from './pages/OffersPage';
 import { SubjectPage } from './pages/student/Subject';
 import { UserDetails } from '@/pages/UserDetails.tsx';
 import Transaction from './pages/Transaction';
+import LiveStream from './pages/LiveStream';
+import UpcomingLive from './pages/UpcomingLive';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = Cookies.get('accessToken');
@@ -81,6 +83,9 @@ const App = () => {
             <Route path="course" element={<CoursePage />} />
             <Route path="mentor" element={<MentorePage />} />
             <Route path="offer" element={<OfferPage />} />
+            <Route path="live" element={<LiveStream />} />
+            {/* <Route path="live/:liveId" element={<LiveStream />} /> */}
+            <Route path="upcomingLive" element={<UpcomingLive />} />
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

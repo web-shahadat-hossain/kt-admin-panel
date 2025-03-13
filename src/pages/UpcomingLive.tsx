@@ -8,11 +8,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-
-import { fetchAllTransactions } from '@/store/slices/transaction';
-
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/store/store';
+import { ApiBaseurl, GET_UPCOMING_LIVE } from '@/utils/constants/ApiEndPoints';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import { Link } from 'react-router-dom';
 
 function UpcomingLive() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,21 +26,26 @@ function UpcomingLive() {
     updatedAt: '2025-03-12T14:22:10Z',
   });
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [UpcomingLives, setUpcomingLives] = useState([]);
 
-  const { transactions } = useSelector((store: RootState) => store.transaction);
-
-  const dispatch = useDispatch<AppDispatch>();
-
-  const handleSearch = (page: number) => {
-    dispatch(fetchAllTransactions({ page: page, search: searchQuery }));
+  const fetchUpcomingLive = async () => {
+    try {
+      const response = await axios.get(ApiBaseurl + GET_UPCOMING_LIVE, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('accessToken')}`,
+        },
+      });
+      const data = response.data.data;
+      setUpcomingLives(data);
+    } catch (error) {
+      console.error('Error fetching UpcomingLive:', error);
+      setUpcomingLives([]); // Set empty array on error to prevent map() failure
+    }
   };
 
   useEffect(() => {
-    if (searchQuery.length === 0 || searchQuery.length === 10) {
-      handleSearch(1);
-    }
-  }, [searchQuery]);
+    fetchUpcomingLive();
+  }, []);
 
   const handleSaveData = (updatedData) => {
     setStreamData(updatedData);
@@ -51,13 +55,6 @@ function UpcomingLive() {
 
   return (
     <div className="p-4">
-      {/* <button
-        onClick={() => setIsModalOpen(true)}
-        className="px-4 py-2 bg-blue-600 text-white rounded-md"
-      >
-        Add Up Coming Live
-      </button> */}
-
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-bold text-gray-900">Upcoming Live</h1>
         <button
@@ -72,48 +69,49 @@ function UpcomingLive() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Referral Name</TableHead>
-              <TableHead>Referral Mobile</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Mobile</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Points</TableHead>
-              <TableHead>Transaction Type</TableHead>
-              <TableHead>Transaction Date</TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead>Stream Key</TableHead>
+              <TableHead>Start Date</TableHead>
+              <TableHead>Is Live</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
-            {transactions.map((transaction) => {
-              console.log(
-                '=========================================',
-                transaction
-              );
-              return (
-                <TableRow key={transaction?._id}>
-                  <TableCell>{transaction?.referredBy?.name}</TableCell>
-                  <TableCell>{transaction?.referredBy?.mobile}</TableCell>
-                  <TableCell>{transaction?.referredTo?.name}</TableCell>
-                  <TableCell>{transaction?.referredTo?.mobile}</TableCell>
-                  <TableCell>₹{transaction?.amount / 100 || 0}</TableCell>
-                  <TableCell>{transaction?.points}</TableCell>
-                  <TableCell>
-                    {transaction?.transactionType === 'C'
-                      ? 'Withdraw'
-                      : 'Deposit'}
-                  </TableCell>
+            {UpcomingLives.length > 0 ? (
+              UpcomingLives.map((upcomingLive) => (
+                <TableRow key={upcomingLive?._id}>
+                  <TableCell>{upcomingLive?.title}</TableCell>
+                  <TableCell>{upcomingLive?.streamKey}</TableCell>
                   <TableCell>
                     <div className="flex flex-col items-start">
                       <span>
-                        {new Date(transaction?.date).toLocaleDateString()}
+                        {new Date(upcomingLive?.startDate).toLocaleDateString()}
                       </span>
                       <span>
-                        {new Date(transaction?.date).toLocaleTimeString()}
+                        {new Date(upcomingLive?.startDate).toLocaleTimeString()}
                       </span>
                     </div>
                   </TableCell>
+                  <TableCell>{upcomingLive?.isLive ? 'Yes' : 'No'}</TableCell>
+
+                  <TableCell>
+                    <Link
+                      to={`/dashboard/live/${upcomingLive?._id}`}
+                      className="px-2 py-1 bg-blue-600 text-white rounded-md text-sm"
+                    >
+                      Go Live
+                    </Link>
+                  </TableCell>
                 </TableRow>
-              );
-            })}
+              ))
+            ) : (
+              <TableRow>
+                <TableCell className="text-center">
+                  No Upcoming Live Streams
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>

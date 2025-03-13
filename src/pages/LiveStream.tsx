@@ -1,5 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import IVSBroadcastClient, { BASIC_LANDSCAPE } from 'amazon-ivs-web-broadcast';
+import axios from 'axios';
+import { ApiBaseurl, START_STREAM } from '@/utils/constants/ApiEndPoints';
+import Cookies from 'js-cookie';
 
 const LiveStream = () => {
   const canvasRef = useRef(null);
@@ -78,6 +81,87 @@ const LiveStream = () => {
       }
     }
   };
+
+  // const startStream = async (streamKey: string, id: string) => {
+  //   if (broadcastClient) {
+  //     try {
+  //       // First try to start the broadcast client
+  //       await broadcastClient.startBroadcast(streamKey);
+  //       console.log('Live stream started!');
+  //       setIsStreaming(true);
+
+  //       // Get auth token from cookies
+  //       const authToken = Cookies.get('authToken');
+
+  //       if (!authToken) {
+  //         console.error('Auth token not found in cookies');
+  //         return;
+  //       }
+
+  //       // Then notify your backend API that the stream has started
+  //       try {
+  //         const response = await axios.post(
+  //           `${ApiBaseurl}${START_STREAM(id)}`,
+  //           {
+  //             title:
+  //             streamKey: streamKey,
+  //             isActive: true,
+  //             startedAt: new Date().toISOString(),
+  //           },
+  //           {
+  //             headers: {
+  //               Authorization: `Bearer ${authToken}`,
+  //               'Content-Type': 'application/json',
+  //             },
+  //           }
+  //         );
+
+  //         console.log('Backend notified of stream start:', response.data);
+
+  //         // You might want to handle the response accordingly
+  //         if (response.data.success) {
+  //           console.log('Stream successfully registered with backend');
+  //         }
+  //       } catch (apiError) {
+  //         console.error('Failed to notify backend of stream start:', apiError);
+  //         // You might want to handle this error (perhaps the stream continues but backend isn't notified)
+  //       }
+  //     } catch (streamError) {
+  //       console.error('Failed to start stream:', streamError);
+  //       setIsStreaming(false);
+
+  //       // Get auth token from cookies
+  //       const authToken = Cookies.get('authToken'); // Replace 'authToken' with your actual cookie name
+
+  //       // Optionally notify backend of failed attempt
+  //       if (authToken) {
+  //         try {
+  //           await axios.post(
+  //             `${ApiBaseurl}${START_STREAM(id)}`,
+  //             {
+  //               streamKey: streamKey,
+  //               isActive: false,
+  //               error: streamError.message,
+  //             },
+  //             {
+  //               headers: {
+  //                 Authorization: `Bearer ${authToken}`,
+  //                 'Content-Type': 'application/json',
+  //               },
+  //             }
+  //           );
+  //         } catch (notifyError) {
+  //           console.error(
+  //             'Failed to notify backend of stream error:',
+  //             notifyError
+  //           );
+  //         }
+  //       }
+  //     }
+  //   } else {
+  //     console.error('Broadcast client not initialized');
+  //   }
+  // };
 
   const stopStream = async () => {
     if (broadcastClient) {

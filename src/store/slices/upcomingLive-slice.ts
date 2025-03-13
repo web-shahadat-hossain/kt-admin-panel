@@ -1,9 +1,11 @@
 import { CourseFormValues } from '@/lib/validations/course-schema';
+import { upComingLiveFormValues } from '@/lib/validations/upcomingLive-schema';
 import { initialState, Live } from '@/types/upcoming-live';
 import {
   coursesUpdate,
   createNewCourse,
   GET_UPCOMING_STREAM,
+  START_STREAM,
 } from '@/utils/constants/ApiEndPoints';
 import axiosInstance from '@/utils/network/AxiosInstance';
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
@@ -24,17 +26,17 @@ export const fetchUpcomingLive = createAsyncThunk(
   }
 );
 
-// export const createCourse = createAsyncThunk(
-//   "courses/addCourse",
-//   async (course: CourseFormValues, { rejectWithValue }) => {
-//     try {
-//       const response = await axiosInstance.post(createNewCourse, course);
-//       return response.data;
-//     } catch (error) {
-//       return rejectWithValue(error);
-//     }
-//   }
-// );
+export const createUpComingLive = createAsyncThunk(
+  'live/startUpcomingLive',
+  async (course: upComingLiveFormValues, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(START_STREAM, course);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
 // export const updateCourse = createAsyncThunk(
 //   "courses/updateCourse",

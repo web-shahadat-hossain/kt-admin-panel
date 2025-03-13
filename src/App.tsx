@@ -83,8 +83,8 @@ const App = () => {
             <Route path="course" element={<CoursePage />} />
             <Route path="mentor" element={<MentorePage />} />
             <Route path="offer" element={<OfferPage />} />
-            <Route path="live" element={<LiveStream />} />
-            {/* <Route path="live/:liveId" element={<LiveStream />} /> */}
+            {/* <Route path="live" element={<LiveStream />} /> */}
+            <Route path="live/:liveId" element={<LiveStream />} />
             <Route path="upcomingLive" element={<UpcomingLive />} />
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

@@ -80,7 +80,7 @@ const DashboardLayout = () => {
     },
     { icon: Percent, label: 'Manage Offers', path: '/dashboard/offer' },
     { icon: Video, label: 'Upcoming Live', path: '/dashboard/upcomingLive' },
-    { icon: Video, label: ' Live', path: '/dashboard/live' },
+    // { icon: Video, label: ' Live', path: '/dashboard/live' },
     // { icon: Settings, label: "Settings", path: "/dashboard/settings" },
   ];
 

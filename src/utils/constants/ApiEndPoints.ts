@@ -84,7 +84,8 @@ export const GET_ELIGIBLE_QUIZZES = '/quiz/getEligibleOfrQuizzes';
 export const GET_ELIGIBLE_COURSES = '/course/getEligibleOfrCourses';
 
 // live
-export const GET_UPCOMING_STREAM = '/stream/upcoming-stream';
-export const START_STREAM = '/stream/start-stream';
-export const STOP_STREAM = '/stream/stop-stream';
+export const GET_UPCOMING_LIVE = '/stream';
+export const CREATE_UPCOMING_LIVE = '/stream/create-stream';
+export const START_STREAM = (id: string) => `/stream/start-stream/${id}`;
+export const STOP_STREAM = '/stream/stop-stream/';
 export const GOT_VIEWERS = '/stream/getViewers';

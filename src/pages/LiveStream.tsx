@@ -1,13 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import IVSBroadcastClient, { BASIC_LANDSCAPE } from 'amazon-ivs-web-broadcast';
-import axios from 'axios';
-import { ApiBaseurl, START_STREAM } from '@/utils/constants/ApiEndPoints';
+import { ApiBaseurl, STOP_STREAM } from '@/utils/constants/ApiEndPoints';
 import Cookies from 'js-cookie';
+import axios from 'axios';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 const LiveStream = () => {
   const canvasRef = useRef(null);
   const [broadcastClient, setBroadcastClient] = useState(null);
   const [isStreaming, setIsStreaming] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Replace with your Amazon IVS ingest URL and Stream Key
   const ingestEndpoint =
@@ -50,11 +54,8 @@ const LiveStream = () => {
               index: 0, // Position in the composition (z-index)
               width: 1280, // Width in pixels
               height: 720, // Height in pixels
-              x: 0, // X position (0 is left)
+              x: -200, // X position (0 is left)
               y: 0, // Y position (0 is top)
-              zIndex: 1, // Layer order
-              opacity: 1.0, // Opacity (1.0 is fully opaque)
-              scaleMode: 'FILL', // Scaling mode: 'FILL', 'FIT', or 'CROP'
             });
             client.addAudioInputDevice(stream, 'mic1');
             // console.log('stream', stream);
@@ -72,116 +73,60 @@ const LiveStream = () => {
 
   const startStream = async () => {
     if (broadcastClient) {
-      try {
-        await broadcastClient.startBroadcast(streamKey);
-        console.log('Live stream started!');
-        setIsStreaming(true);
-      } catch (error) {
-        console.error('Failed to start stream:', error);
-      }
+      await broadcastClient.startBroadcast(streamKey);
+      setIsStreaming(true);
     }
   };
-
-  // const startStream = async (streamKey: string, id: string) => {
-  //   if (broadcastClient) {
-  //     try {
-  //       // First try to start the broadcast client
-  //       await broadcastClient.startBroadcast(streamKey);
-  //       console.log('Live stream started!');
-  //       setIsStreaming(true);
-
-  //       // Get auth token from cookies
-  //       const authToken = Cookies.get('authToken');
-
-  //       if (!authToken) {
-  //         console.error('Auth token not found in cookies');
-  //         return;
-  //       }
-
-  //       // Then notify your backend API that the stream has started
-  //       try {
-  //         const response = await axios.post(
-  //           `${ApiBaseurl}${START_STREAM(id)}`,
-  //           {
-  //             title:
-  //             streamKey: streamKey,
-  //             isActive: true,
-  //             startedAt: new Date().toISOString(),
-  //           },
-  //           {
-  //             headers: {
-  //               Authorization: `Bearer ${authToken}`,
-  //               'Content-Type': 'application/json',
-  //             },
-  //           }
-  //         );
-
-  //         console.log('Backend notified of stream start:', response.data);
-
-  //         // You might want to handle the response accordingly
-  //         if (response.data.success) {
-  //           console.log('Stream successfully registered with backend');
-  //         }
-  //       } catch (apiError) {
-  //         console.error('Failed to notify backend of stream start:', apiError);
-  //         // You might want to handle this error (perhaps the stream continues but backend isn't notified)
-  //       }
-  //     } catch (streamError) {
-  //       console.error('Failed to start stream:', streamError);
-  //       setIsStreaming(false);
-
-  //       // Get auth token from cookies
-  //       const authToken = Cookies.get('authToken'); // Replace 'authToken' with your actual cookie name
-
-  //       // Optionally notify backend of failed attempt
-  //       if (authToken) {
-  //         try {
-  //           await axios.post(
-  //             `${ApiBaseurl}${START_STREAM(id)}`,
-  //             {
-  //               streamKey: streamKey,
-  //               isActive: false,
-  //               error: streamError.message,
-  //             },
-  //             {
-  //               headers: {
-  //                 Authorization: `Bearer ${authToken}`,
-  //                 'Content-Type': 'application/json',
-  //               },
-  //             }
-  //           );
-  //         } catch (notifyError) {
-  //           console.error(
-  //             'Failed to notify backend of stream error:',
-  //             notifyError
-  //           );
-  //         }
-  //       }
-  //     }
-  //   } else {
-  //     console.error('Broadcast client not initialized');
-  //   }
-  // };
 
   const stopStream = async () => {
-    if (broadcastClient) {
-      await broadcastClient.stopBroadcast();
-      console.log('Live stream stopped!');
-      setIsStreaming(false);
+    try {
+      const response = await axios.post(
+        ApiBaseurl + STOP_STREAM,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('accessToken')}`,
+          },
+        }
+      );
+      if (broadcastClient) {
+        await broadcastClient.stopBroadcast();
+        setIsStreaming(false);
+      }
+      navigate('/dashboard/upcomingLive');
+      toast({
+        title: 'Live Stopped',
+        description: 'Live stopped Successfully',
+      });
+    } catch (error) {
+      toast({
+        title: 'Live error',
+        description: error.response.data.error || 'Something went wrong',
+      });
     }
   };
+
+  // useEffect(() => {
+  //   const handleBeforeUnload = () => {
+  //     stopStream(); // Call stop function before closing
+  //   };
+
+  //   window.addEventListener('beforeunload', handleBeforeUnload);
+
+  //   return () => {
+  //     window.removeEventListener('beforeunload', handleBeforeUnload);
+  //   };
+  // }, []);
 
   return (
     <div>
-      <h2>Admin Live Stream</h2>
-      {/* Use canvasRef */}
-      <canvas
-        ref={canvasRef}
-        width="600"
-        height="400"
-        style={{ border: '2px solid black' }}
-      />
-      <br />
+      <div className="w-full h-[80vh]">
+        <canvas
+          ref={canvasRef}
+          className="w-full h-full"
+          style={{ border: '2px solid black' }}
+        />
+      </div>
       {!isStreaming ? (
         <button
           onClick={startStream}

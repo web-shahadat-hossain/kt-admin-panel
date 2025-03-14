@@ -1,32 +1,43 @@
 import React, { useState } from 'react';
-import { Calendar, X } from 'lucide-react';
+import { X } from 'lucide-react';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import {
+  ApiBaseurl,
+  CREATE_UPCOMING_LIVE,
+} from '@/utils/constants/ApiEndPoints';
 
-const StreamModal = ({ isOpen, onClose, initialData, onSave }) => {
-  const [formData, setFormData] = useState(
-    initialData || {
-      title: '',
-      playbackUrl: '',
-      streamKey: '',
-      isLive: false,
-      startDate: new Date().toISOString().split('T')[0],
-      upcomming: false,
-      createdAt: '',
-      updatedAt: '',
-    }
-  );
+const StreamModal = ({ isOpen, onClose, refetch = () => {} }) => {
+  const [formData, setFormData] = useState({
+    title: '',
+    startDate: new Date().toISOString().split('T')[0],
+  });
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: value,
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSave(formData);
-    onClose();
+    try {
+      const response = await axios.post(
+        ApiBaseurl + CREATE_UPCOMING_LIVE,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('accessToken')}`,
+          },
+        }
+      );
+      refetch();
+      onClose();
+    } catch (error) {
+      console.error('Error fetching UpcomingLive:', error);
+    }
   };
 
   if (!isOpen) return null;
@@ -67,55 +78,6 @@ const StreamModal = ({ isOpen, onClose, initialData, onSave }) => {
               />
             </div>
 
-            {/* Playback URL */}
-            <div>
-              <label
-                htmlFor="playbackUrl"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Playback URL
-              </label>
-              <input
-                id="playbackUrl"
-                name="playbackUrl"
-                type="url"
-                value={formData.playbackUrl}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-
-            {/* Stream Key */}
-            <div>
-              <label
-                htmlFor="streamKey"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Stream Key
-              </label>
-              <div className="relative">
-                <input
-                  id="streamKey"
-                  name="streamKey"
-                  type="text"
-                  value={formData.streamKey}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded"
-                  onClick={() =>
-                    navigator.clipboard.writeText(formData.streamKey)
-                  }
-                >
-                  Copy
-                </button>
-              </div>
-            </div>
-
             {/* Start Date */}
             <div>
               <label
@@ -128,83 +90,15 @@ const StreamModal = ({ isOpen, onClose, initialData, onSave }) => {
                 <input
                   id="startDate"
                   name="startDate"
-                  type="date"
+                  type="datetime-local"
                   value={formData.startDate}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
-                <Calendar
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  size={16}
-                />
               </div>
             </div>
-
-            {/* Checkboxes */}
-            <div className="flex flex-col sm:flex-row sm:space-x-4">
-              <div className="flex items-center mb-2 sm:mb-0">
-                <input
-                  id="isLive"
-                  name="isLive"
-                  type="checkbox"
-                  checked={formData.isLive}
-                  onChange={handleChange}
-                  className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
-                />
-                <label htmlFor="isLive" className="ml-2 text-sm text-gray-700">
-                  Is Live
-                </label>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  id="upcomming"
-                  name="upcomming"
-                  type="checkbox"
-                  checked={formData.upcomming}
-                  onChange={handleChange}
-                  className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="upcomming"
-                  className="ml-2 text-sm text-gray-700"
-                >
-                  Upcoming
-                </label>
-              </div>
-            </div>
-
-            {/* Read-only Fields */}
-            {formData.createdAt && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Created At
-                </label>
-                <input
-                  type="text"
-                  value={formData.createdAt}
-                  className="w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 focus:outline-none"
-                  readOnly
-                />
-              </div>
-            )}
-
-            {formData.updatedAt && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Updated At
-                </label>
-                <input
-                  type="text"
-                  value={formData.updatedAt}
-                  className="w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 focus:outline-none"
-                  readOnly
-                />
-              </div>
-            )}
           </div>
-
           <div className="mt-6 flex justify-end space-x-3">
             <button
               type="button"

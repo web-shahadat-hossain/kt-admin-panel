@@ -8,23 +8,20 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ApiBaseurl, GET_UPCOMING_LIVE } from '@/utils/constants/ApiEndPoints';
+import {
+  ApiBaseurl,
+  GET_UPCOMING_LIVE,
+  START_STREAM,
+} from '@/utils/constants/ApiEndPoints';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { Link } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 function UpcomingLive() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [streamData, setStreamData] = useState({
-    title: 'My Live Stream',
-    playbackUrl: 'https://example.com/stream',
-    streamKey: 'abc123xyz',
-    isLive: true,
-    startDate: '2025-03-15',
-    upcomming: false,
-    createdAt: '2025-03-10T08:30:45Z',
-    updatedAt: '2025-03-12T14:22:10Z',
-  });
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   const [UpcomingLives, setUpcomingLives] = useState([]);
 
@@ -47,10 +44,32 @@ function UpcomingLive() {
     fetchUpcomingLive();
   }, []);
 
-  const handleSaveData = (updatedData) => {
-    setStreamData(updatedData);
-    console.log('Saved data:', updatedData);
-    // Here you would typically send the data to your API
+  const startStream = async (id) => {
+    try {
+      const response = await axios.post(
+        ApiBaseurl + START_STREAM(id),
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('accessToken')}`,
+          },
+        }
+      );
+
+      if (response?.data?.data?.isLive) {
+        fetchUpcomingLive();
+        navigate(`/dashboard/live/${id}`);
+        toast({
+          title: 'Toast Created',
+          description: 'The Live is Started successfully',
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Live error',
+        description: error.response.data.error || 'Something went wrong',
+      });
+    }
   };
 
   return (
@@ -96,12 +115,12 @@ function UpcomingLive() {
                   <TableCell>{upcomingLive?.isLive ? 'Yes' : 'No'}</TableCell>
 
                   <TableCell>
-                    <Link
-                      to={`/dashboard/live/${upcomingLive?._id}`}
+                    <button
+                      onClick={() => startStream(upcomingLive?._id)}
                       className="px-2 py-1 bg-blue-600 text-white rounded-md text-sm"
                     >
                       Go Live
-                    </Link>
+                    </button>
                   </TableCell>
                 </TableRow>
               ))
@@ -119,8 +138,7 @@ function UpcomingLive() {
       <StreamModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        initialData={streamData}
-        onSave={handleSaveData}
+        refetch={fetchUpcomingLive}
       />
     </div>
   );

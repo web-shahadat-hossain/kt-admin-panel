@@ -34,7 +34,7 @@ const LiveStream = () => {
 
     // Access available devices
     navigator.mediaDevices
-      .enumerateDevices()
+      ?.enumerateDevices()
       .then((devices) => {
         const videoDevices = devices.filter(
           (device) => device.kind === 'videoinput'

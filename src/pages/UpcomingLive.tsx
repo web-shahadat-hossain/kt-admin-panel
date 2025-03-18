@@ -33,6 +33,7 @@ function UpcomingLive() {
         },
       });
       const data = response.data.data;
+
       setUpcomingLives(data);
     } catch (error) {
       console.error('Error fetching UpcomingLive:', error);
@@ -89,6 +90,8 @@ function UpcomingLive() {
           <TableHeader>
             <TableRow>
               <TableHead>Title</TableHead>
+              <TableHead>Standard</TableHead>
+              <TableHead>Board</TableHead>
               <TableHead>Stream Key</TableHead>
               <TableHead>Start Date</TableHead>
               <TableHead>Is Live</TableHead>
@@ -98,32 +101,41 @@ function UpcomingLive() {
 
           <TableBody>
             {UpcomingLives.length > 0 ? (
-              UpcomingLives.map((upcomingLive) => (
-                <TableRow key={upcomingLive?._id}>
-                  <TableCell>{upcomingLive?.title}</TableCell>
-                  <TableCell>{upcomingLive?.streamKey}</TableCell>
-                  <TableCell>
-                    <div className="flex flex-col items-start">
-                      <span>
-                        {new Date(upcomingLive?.startDate).toLocaleDateString()}
-                      </span>
-                      <span>
-                        {new Date(upcomingLive?.startDate).toLocaleTimeString()}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{upcomingLive?.isLive ? 'Yes' : 'No'}</TableCell>
+              UpcomingLives.map((upcomingLive) => {
+                console.log(upcomingLive);
+                return (
+                  <TableRow key={upcomingLive?._id}>
+                    <TableCell>{upcomingLive?.title}</TableCell>
+                    <TableCell>{upcomingLive?.standard?.std}</TableCell>
+                    <TableCell>{upcomingLive?.boardId?.boardname}</TableCell>
+                    <TableCell>{upcomingLive?.streamKey}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-col items-start">
+                        <span>
+                          {new Date(
+                            upcomingLive?.startDate
+                          ).toLocaleDateString()}
+                        </span>
+                        <span>
+                          {new Date(
+                            upcomingLive?.startDate
+                          ).toLocaleTimeString()}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{upcomingLive?.isLive ? 'Yes' : 'No'}</TableCell>
 
-                  <TableCell>
-                    <button
-                      onClick={() => startStream(upcomingLive?._id)}
-                      className="px-2 py-1 bg-blue-600 text-white rounded-md text-sm"
-                    >
-                      Go Live
-                    </button>
-                  </TableCell>
-                </TableRow>
-              ))
+                    <TableCell>
+                      <button
+                        onClick={() => startStream(upcomingLive?._id)}
+                        className="px-2 py-1 bg-blue-600 text-white rounded-md text-sm"
+                      >
+                        Go Live
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell className="text-center">

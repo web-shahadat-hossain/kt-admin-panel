@@ -1,28 +1,32 @@
 import React, { useEffect, useRef, useState } from 'react';
 import IVSBroadcastClient, { BASIC_LANDSCAPE } from 'amazon-ivs-web-broadcast';
-import { ApiBaseurl, STOP_STREAM } from '@/utils/constants/ApiEndPoints';
+import {
+  ApiBaseurl,
+  START_STREAM,
+  STOP_STREAM,
+} from '@/utils/constants/ApiEndPoints';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const LiveStream = () => {
+  const { state } = useLocation();
   const canvasRef = useRef(null);
   const [broadcastClient, setBroadcastClient] = useState(null);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [message, setMessage] = useState('');
+  const [chatMessages, setChatMessages] = useState([]);
+
   const { toast } = useToast();
   const navigate = useNavigate();
-
-  // Replace with your Amazon IVS ingest URL and Stream Key
-  const ingestEndpoint =
-    'rtmps://6b879004354a.global-contribute.live-video.net:443/app/';
-  const streamKey = 'sk_ap-south-1_4LeRY8OAJOep_ZX2Eci4lRcTxA8SND1PngxjmaeNKSY';
+  const chatWebSocket = useRef(null);
 
   useEffect(() => {
     // Initialize Amazon IVS Broadcast Client
     const client = IVSBroadcastClient.create({
       streamConfig: BASIC_LANDSCAPE, // Stream in landscape mode
-      ingestEndpoint: ingestEndpoint,
+      ingestEndpoint: `rtmps://${state?.ingestUrl}/app/`,
     });
 
     setBroadcastClient(client);
@@ -72,9 +76,32 @@ const LiveStream = () => {
   }, []);
 
   const startStream = async () => {
-    if (broadcastClient) {
-      await broadcastClient.startBroadcast(streamKey);
-      setIsStreaming(true);
+    try {
+      const response = await axios.post(
+        ApiBaseurl + START_STREAM(state?._id),
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('accessToken')}`,
+          },
+        }
+      );
+
+      if (broadcastClient) {
+        await broadcastClient.startBroadcast(state?.streamId);
+        connectToChat();
+        setIsStreaming(true);
+      }
+
+      toast({
+        title: 'Toast Created',
+        description: 'The Live is Started successfully',
+      });
+    } catch (error) {
+      toast({
+        title: 'Live error',
+        description: error.response.data.error || 'Something went wrong',
+      });
     }
   };
 
@@ -106,52 +133,103 @@ const LiveStream = () => {
     }
   };
 
-  // useEffect(() => {
-  //   const handleBeforeUnload = () => {
-  //     stopStream(); // Call stop function before closing
-  //   };
+  const connectToChat = async () => {
+    const response = await axios.post(ApiBaseurl + `/stream/get-chat-token`, {
+      chatRoomArn: state?.chatRoomId,
+      userId: 'admin',
+    });
 
-  //   window.addEventListener('beforeunload', handleBeforeUnload);
+    const { token } = response.data;
 
-  //   return () => {
-  //     window.removeEventListener('beforeunload', handleBeforeUnload);
-  //   };
-  // }, []);
+    chatWebSocket.current = new WebSocket(
+      'wss://edge.ivschat.ap-south-1.amazonaws.com',
+      token
+    );
+    chatWebSocket.current.onmessage = (event) => {
+      const newMessage = JSON.parse(event.data);
+      setChatMessages((prev) => [...prev, newMessage]);
+    };
+  };
+
+  const sendMessage = () => {
+    if (chatWebSocket.current) {
+      const payload = {
+        Action: 'SEND_MESSAGE',
+        SenderName: 'Forhad',
+        Content: message,
+        attributes: {
+          senderName: 'Forhad', // Custom attribute for sender name
+        },
+      };
+      chatWebSocket.current.send(JSON.stringify(payload));
+      setMessage('');
+    }
+  };
 
   return (
-    <div>
-      <div className="w-full h-[80vh]">
-        <canvas
-          ref={canvasRef}
-          className="w-full h-full"
-          style={{ border: '2px solid black' }}
-        />
+    <div className="flex">
+      <div className="basis-2/3">
+        <div className="w-full h-[70vh]">
+          <canvas
+            ref={canvasRef}
+            className="w-full h-full"
+            style={{ border: '2px solid black' }}
+          />
+        </div>
+        {!isStreaming ? (
+          <button
+            onClick={startStream}
+            style={{
+              padding: '10px',
+              margin: '10px',
+              backgroundColor: 'ButtonText',
+              color: 'white',
+            }}
+          >
+            Start Live
+          </button>
+        ) : (
+          <button
+            onClick={stopStream}
+            style={{
+              padding: '10px',
+              margin: '10px',
+              backgroundColor: 'red',
+              color: 'white',
+            }}
+          >
+            Stop Live
+          </button>
+        )}
       </div>
-      {!isStreaming ? (
-        <button
-          onClick={startStream}
-          style={{
-            padding: '10px',
-            margin: '10px',
-            backgroundColor: 'ButtonText',
-            color: 'white',
-          }}
-        >
-          Start Live
-        </button>
-      ) : (
-        <button
-          onClick={stopStream}
-          style={{
-            padding: '10px',
-            margin: '10px',
-            backgroundColor: 'red',
-            color: 'white',
-          }}
-        >
-          Stop Live
-        </button>
-      )}
+      <div className="basis-1/3">
+        <div className="h-[70vh] overflow-y-auto">
+          {chatMessages.map((message) => (
+            <div key={message.Id}>
+              <p>{message.Attributes.senderName}</p>
+              <p>{message.Content}</p>
+            </div>
+          ))}
+        </div>
+        <div>
+          <input
+            type="text"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <button
+            onClick={sendMessage}
+            style={{
+              padding: '10px',
+              margin: '10px',
+              backgroundColor: 'red',
+              color: 'white',
+            }}
+          >
+            Send
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

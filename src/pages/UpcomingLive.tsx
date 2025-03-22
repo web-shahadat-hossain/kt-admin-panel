@@ -8,30 +8,31 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  ApiBaseurl,
-  GET_UPCOMING_LIVE,
-  START_STREAM,
-} from '@/utils/constants/ApiEndPoints';
+import { ApiBaseurl, GET_UPCOMING_LIVE } from '@/utils/constants/ApiEndPoints';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
 function UpcomingLive() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { toast } = useToast();
+
   const navigate = useNavigate();
 
   const [UpcomingLives, setUpcomingLives] = useState([]);
 
   const fetchUpcomingLive = async () => {
     try {
-      const response = await axios.get(ApiBaseurl + GET_UPCOMING_LIVE, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get('accessToken')}`,
+      const response = await axios.post(
+        ApiBaseurl + GET_UPCOMING_LIVE,
+        {
+          upcomming: true,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('accessToken')}`,
+          },
+        }
+      );
       const data = response.data.data;
       setUpcomingLives(data);
     } catch (error) {
@@ -43,34 +44,6 @@ function UpcomingLive() {
   useEffect(() => {
     fetchUpcomingLive();
   }, []);
-
-  const startStream = async (id) => {
-    try {
-      const response = await axios.post(
-        ApiBaseurl + START_STREAM(id),
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get('accessToken')}`,
-          },
-        }
-      );
-
-      if (response?.data?.data?.isLive) {
-        fetchUpcomingLive();
-        navigate(`/dashboard/live/${id}`);
-        toast({
-          title: 'Toast Created',
-          description: 'The Live is Started successfully',
-        });
-      }
-    } catch (error) {
-      toast({
-        title: 'Live error',
-        description: error.response.data.error || 'Something went wrong',
-      });
-    }
-  };
 
   return (
     <div className="p-4">
@@ -116,7 +89,11 @@ function UpcomingLive() {
 
                   <TableCell>
                     <button
-                      onClick={() => startStream(upcomingLive?._id)}
+                      onClick={() =>
+                        navigate(`/dashboard/live/${upcomingLive?._id}`, {
+                          state: upcomingLive,
+                        })
+                      }
                       className="px-2 py-1 bg-blue-600 text-white rounded-md text-sm"
                     >
                       Go Live

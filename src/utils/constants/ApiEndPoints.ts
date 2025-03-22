@@ -1,5 +1,7 @@
 export const ApiBaseurl: string = `${import.meta.env.VITE_API_BASE_URL}/admin`;
+// export const ApiBaseurl: string = `http://13.233.246.47/api/v1/admin`;
 export const ApiBaseurl2: string = import.meta.env.VITE_API_BASE_URL;
+// export const ApiBaseurl2: string = `http://13.233.246.47/api/v1`;
 
 //admin
 export const AdminLoginUrl: string = '/login';

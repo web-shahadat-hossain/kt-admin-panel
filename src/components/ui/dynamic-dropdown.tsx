@@ -1,15 +1,15 @@
-import React, { useRef, useState } from "react";
-import { useController, Control } from "react-hook-form";
+import React, { useRef, useState } from 'react';
+import { useController, Control } from 'react-hook-form';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { ChevronDownIcon, XIcon } from "lucide-react";
-import { FormLabel } from "./form";
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { ChevronDownIcon, XIcon } from 'lucide-react';
+import { FormLabel } from './form';
 
 interface DynamicDropdownProps {
   placeholder: string;
@@ -30,7 +30,7 @@ export const DynamicDropdown = ({
   onItemSelect,
   canLocalSearch = true,
 }: DynamicDropdownProps) => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
 
   const {
     field: { value: selectedItem, onChange },
@@ -48,11 +48,11 @@ export const DynamicDropdown = ({
     e.stopPropagation();
     onChange(null);
     if (canLocalSearch) {
-      setSearchTerm("");
+      setSearchTerm('');
     } else {
-      onSearch("");
+      onSearch('');
     }
-    onItemSelect("");
+    onItemSelect('');
   };
 
   const filteredItems = listing?.filter((item) =>
@@ -91,12 +91,12 @@ export const DynamicDropdown = ({
               className="mb-2"
             />
           </div>
-          {filteredItems.map((item) => (
+          {filteredItems?.map((item) => (
             <DropdownMenuItem
               key={item.id}
               onSelect={() => handleItemClick(item.id)}
               className={`flex items-center space-x-2 ${
-                selectedItem === item.id ? "bg-gray-200" : ""
+                selectedItem === item.id ? 'bg-gray-200' : ''
               }`}
             >
               <span>{item.label}</span>

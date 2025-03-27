@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { QuizFormSchema } from "@/lib/validations/quiz-schema";
 import { Quiz, QuizResponse } from "@/types/quiz";
 import {
@@ -105,6 +106,21 @@ export const getQuizResult = createAsyncThunk(
   ) => {
     try {
       const response = await axiosInstance.post(quizResult, { quizId, page });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const getQuizLeaderboard = createAsyncThunk(
+  "quiz/quiz-leader-board",
+  async (
+    { quizId, page }: { quizId: string; page: number },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axiosInstance.get(quizResult);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);

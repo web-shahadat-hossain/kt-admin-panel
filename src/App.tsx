@@ -1,34 +1,35 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Toaster } from '@/components/ui/toaster';
-import Login from './pages/Login';
-import DashboardLayout from './components/DashboardLayout';
-import Users from './pages/Users';
-import Quiz from './pages/Quiz';
-import Payments from './pages/Payments';
-import DashboardCards from './components/dashboard/DashboardCards';
-import LessonPage from './pages/LessonPage';
-import { CoursePage } from './pages/CoursePage';
-import Board from './pages/student/Board';
-import StandardTable from './pages/student/Standard';
-import Activity from './pages/student/Activity';
-import Cookies from 'js-cookie';
-import CheckoutPage from './pages/checkout/CheckoutPage';
-import PaymentStatusPage from './pages/checkout/PaymentStatusPage';
-import { MentorePage } from './pages/MentorePage';
-import { OfferPage } from './pages/OffersPage';
-import { SubjectPage } from './pages/student/Subject';
-import { UserDetails } from '@/pages/UserDetails.tsx';
-import Transaction from './pages/Transaction';
-import LiveStream from './pages/LiveStream';
-import UpcomingLive from './pages/UpcomingLive';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
+import Login from "./pages/Login";
+import DashboardLayout from "./components/DashboardLayout";
+import Users from "./pages/Users";
+import Quiz from "./pages/Quiz";
+import Payments from "./pages/Payments";
+import DashboardCards from "./components/dashboard/DashboardCards";
+import LessonPage from "./pages/LessonPage";
+import { CoursePage } from "./pages/CoursePage";
+import Board from "./pages/student/Board";
+import StandardTable from "./pages/student/Standard";
+import Activity from "./pages/student/Activity";
+import Cookies from "js-cookie";
+import CheckoutPage from "./pages/checkout/CheckoutPage";
+import PaymentStatusPage from "./pages/checkout/PaymentStatusPage";
+import { MentorePage } from "./pages/MentorePage";
+import { OfferPage } from "./pages/OffersPage";
+import { SubjectPage } from "./pages/student/Subject";
+import { UserDetails } from "@/pages/UserDetails.tsx";
+import Transaction from "./pages/Transaction";
+import LiveStream from "./pages/LiveStream";
+import UpcomingLive from "./pages/UpcomingLive";
+import QuizLeaderboard from "./pages/QuizLeaderboard";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = Cookies.get('accessToken');
+  const isAuthenticated = Cookies.get("accessToken");
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
 };
 
 const App = () => {
-  const isAuthenticated = Cookies.get('accessToken');
+  const isAuthenticated = Cookies.get("accessToken");
 
   return (
     <>
@@ -83,6 +84,8 @@ const App = () => {
             <Route path="course" element={<CoursePage />} />
             <Route path="mentor" element={<MentorePage />} />
             <Route path="offer" element={<OfferPage />} />
+            <Route path="quiz-leader-board" element={<QuizLeaderboard />} />
+
             {/* <Route path="live" element={<LiveStream />} /> */}
             <Route path="live/:liveId" element={<LiveStream />} />
             <Route path="upcomingLive" element={<UpcomingLive />} />

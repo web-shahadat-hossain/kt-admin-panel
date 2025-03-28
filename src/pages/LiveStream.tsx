@@ -155,7 +155,7 @@ const LiveStream = () => {
     if (chatWebSocket.current) {
       const payload = {
         Action: 'SEND_MESSAGE',
-        SenderName: 'Admin',
+        // SenderName: 'Admin',
         Content: message,
         attributes: {
           senderName: 'Admin', // Custom attribute for sender name

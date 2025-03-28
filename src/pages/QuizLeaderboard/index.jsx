@@ -37,7 +37,7 @@ const QuizLeaderboard = () => {
         setLoading(true);
         setError(null);
         const response = await axios.get(
-          "http://localhost:9657/api/v1/admin/quiz/quiz-leader-board",
+          "https://back.knowledgetemple.in/api/v1/admin/quiz/quiz-leader-board",
           {
             headers: { Authorization: `Bearer ${Cookies.get("accessToken")}` },
           }

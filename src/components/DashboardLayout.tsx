@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Outlet, useNavigate, Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { useEffect, useState } from "react";
+import { Outlet, useNavigate, Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
   Users,
@@ -23,16 +23,17 @@ import {
   Percent,
   IndianRupee,
   Video,
-} from 'lucide-react';
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/store/store';
-import { getProfile, logout } from '@/store/slices/auth-slice';
+} from "@/components/ui/dropdown-menu";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { getProfile, logout } from "@/store/slices/auth-slice";
+import { MdLeaderboard } from "react-icons/md";
 
 const DashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -46,40 +47,45 @@ const DashboardLayout = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/login');
+    navigate("/login");
   };
 
   const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-    { icon: Users, label: 'Users', path: '/dashboard/users' },
+    { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+    { icon: Users, label: "Users", path: "/dashboard/users" },
     {
       icon: BookMarked,
-      label: 'Student Corner',
+      label: "Student Corner",
       submenu: [
-        { icon: Activity, label: 'Activity', path: '/dashboard/activity' },
-        { icon: School, label: 'Standard', path: '/dashboard/standard' },
-        { icon: Subject, label: 'Subject', path: '/dashboard/subject' },
-        { icon: LayoutGrid, label: 'Board', path: '/dashboard/board' },
+        { icon: Activity, label: "Activity", path: "/dashboard/activity" },
+        { icon: School, label: "Standard", path: "/dashboard/standard" },
+        { icon: Subject, label: "Subject", path: "/dashboard/subject" },
+        { icon: LayoutGrid, label: "Board", path: "/dashboard/board" },
       ],
     },
     {
       icon: GraduationCap,
-      label: 'Course Manage',
+      label: "Course Manage",
       submenu: [
-        { icon: User2, label: 'Mentor', path: '/dashboard/mentor' },
-        { icon: BookOpenText, label: 'Course', path: '/dashboard/course' },
-        { icon: Presentation, label: 'Lesson', path: '/dashboard/lesson' },
+        { icon: User2, label: "Mentor", path: "/dashboard/mentor" },
+        { icon: BookOpenText, label: "Course", path: "/dashboard/course" },
+        { icon: Presentation, label: "Lesson", path: "/dashboard/lesson" },
       ],
     },
-    { icon: BookOpen, label: 'Quiz Management', path: '/dashboard/quiz' },
-    { icon: CreditCard, label: 'Payments', path: '/dashboard/payments' },
+    { icon: BookOpen, label: "Quiz Management", path: "/dashboard/quiz" },
+    { icon: CreditCard, label: "Payments", path: "/dashboard/payments" },
     {
       icon: IndianRupee,
-      label: 'Transactions',
-      path: '/dashboard/transaction',
+      label: "Transactions",
+      path: "/dashboard/transaction",
     },
-    { icon: Percent, label: 'Manage Offers', path: '/dashboard/offer' },
-    { icon: Video, label: 'Upcoming Live', path: '/dashboard/upcomingLive' },
+    {
+      icon: MdLeaderboard,
+      label: "Quiz Leader Board",
+      path: "/dashboard/quiz-leader-board",
+    },
+    { icon: Percent, label: "Manage Offers", path: "/dashboard/offer" },
+    { icon: Video, label: "Upcoming Live", path: "/dashboard/upcomingLive" },
     // { icon: Video, label: ' Live', path: '/dashboard/live' },
     // { icon: Settings, label: "Settings", path: "/dashboard/settings" },
   ];
@@ -88,7 +94,7 @@ const DashboardLayout = () => {
     <div className="min-h-screen bg-gray-100">
       <div
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-200 ease-in-out ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0`}
       >
         <div className="flex flex-col h-full">
@@ -146,7 +152,7 @@ const DashboardLayout = () => {
 
       <div
         className={`lg:ml-64 min-h-screen transition-all duration-200 ${
-          isSidebarOpen ? 'ml-64' : 'ml-0'
+          isSidebarOpen ? "ml-64" : "ml-0"
         }`}
       >
         <header className="bg-white shadow-sm">

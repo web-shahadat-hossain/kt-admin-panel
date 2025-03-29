@@ -158,10 +158,10 @@ const LiveStream = () => {
     if (chatWebSocket.current) {
       const payload = {
         Action: 'SEND_MESSAGE',
-        SenderName: 'Forhad',
+        // SenderName: 'Admin',
         Content: message,
         attributes: {
-          senderName: 'Forhad', // Custom attribute for sender name
+          senderName: 'Admin', // Custom attribute for sender name
         },
       };
       chatWebSocket.current.send(JSON.stringify(payload));

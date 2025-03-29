@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import Cookies from "js-cookie";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import { useForm } from 'react-hook-form';
 import {
   Table,
   TableBody,
@@ -9,18 +9,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import toast from "react-hot-toast";
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import toast from 'react-hot-toast';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"; // ShadCN Dialog (Modal)
+} from '@/components/ui/dialog'; // ShadCN Dialog (Modal)
 
 const QuizLeaderboard = () => {
   const { register, handleSubmit, reset } = useForm();
@@ -37,15 +37,15 @@ const QuizLeaderboard = () => {
         setLoading(true);
         setError(null);
         const response = await axios.get(
-          "http://localhost:9657/api/v1/admin/quiz/quiz-leader-board",
+          'https://back.knowledgetemple.in/api/v1/admin/quiz/quiz-leader-board',
           {
-            headers: { Authorization: `Bearer ${Cookies.get("accessToken")}` },
+            headers: { Authorization: `Bearer ${Cookies.get('accessToken')}` },
           }
         );
         setLeaderboard(response.data?.data?.docs || []);
         console.log(response.data);
       } catch (err) {
-        toast.error(err.message || "Failed to fetch leaderboard");
+        toast.error(err.message || 'Failed to fetch leaderboard');
       } finally {
         setLoading(false);
       }
@@ -61,15 +61,15 @@ const QuizLeaderboard = () => {
       setError(null);
 
       const formData = new FormData();
-      formData.append("certificate", data.certificate[0]);
+      formData.append('certificate', data.certificate[0]);
 
       const response = await axios.post(
-        `http://localhost:9657/api/v1/admin/quiz/certificate/${selectedUser}`,
+        `https://back.knowledgetemple.in/api/v1/admin/quiz/certificate/${selectedUser}`,
         formData,
         {
           headers: {
-            Authorization: `Bearer ${Cookies.get("accessToken")}`,
-            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${Cookies.get('accessToken')}`,
+            'Content-Type': 'multipart/form-data',
           },
         }
       );
@@ -82,11 +82,11 @@ const QuizLeaderboard = () => {
               : item
           )
         );
-        toast.success("Certificate uploaded successfully!");
+        toast.success('Certificate uploaded successfully!');
         setModalOpen(false); // Close modal after upload
       }
     } catch (err) {
-      toast.error(err.message || "Failed to upload certificate");
+      toast.error(err.message || 'Failed to upload certificate');
     } finally {
       setUploading(false);
       reset();
@@ -129,27 +129,27 @@ const QuizLeaderboard = () => {
                 <TableRow key={result._id || index}>
                   <TableCell>{index + 1}</TableCell>
                   <TableCell className="font-medium">
-                    {result.userId?.name || "N/A"}
+                    {result.userId?.name || 'N/A'}
                   </TableCell>
-                  <TableCell>{result.userId?.email || "N/A"}</TableCell>
-                  <TableCell>{result.userId?.mobile || "N/A"}</TableCell>
+                  <TableCell>{result.userId?.email || 'N/A'}</TableCell>
+                  <TableCell>{result.userId?.mobile || 'N/A'}</TableCell>
                   <TableCell>
-                    {result.quizId?.title || "Quiz not found"}
+                    {result.quizId?.title || 'Quiz not found'}
                   </TableCell>
                   <TableCell className="text-right">
                     <span
                       className={
                         index === 0
-                          ? "text-yellow-500 font-bold"
+                          ? 'text-yellow-500 font-bold'
                           : index === 1
-                          ? "text-gray-500 font-bold"
+                          ? 'text-gray-500 font-bold'
                           : index === 2
-                          ? "text-amber-700 font-bold"
-                          : "font-bold"
+                          ? 'text-amber-700 font-bold'
+                          : 'font-bold'
                       }
                     >
                       {result.score || 0}
-                    </span>{" "}
+                    </span>{' '}
                     / {result.answers?.length || 0}
                   </TableCell>
                   <TableCell>
@@ -195,12 +195,12 @@ const QuizLeaderboard = () => {
                 id="certificate"
                 type="file"
                 accept="image/png, image/jpeg"
-                {...register("certificate", { required: true })}
+                {...register('certificate', { required: true })}
               />
             </div>
             <DialogFooter>
               <Button type="submit" disabled={uploading}>
-                {uploading ? "Uploading..." : "Upload Certificate"}
+                {uploading ? 'Uploading...' : 'Upload Certificate'}
               </Button>
               <Button
                 variant="outline"

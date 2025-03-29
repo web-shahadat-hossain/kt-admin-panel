@@ -17,26 +17,28 @@ const LiveStream = () => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [message, setMessage] = useState('');
   const [chatMessages, setChatMessages] = useState([]);
+  const [isPaused, setIsPaused] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+
+  const videoStream = useRef(null);
+  const audioStream = useRef(null);
 
   const { toast } = useToast();
   const navigate = useNavigate();
   const chatWebSocket = useRef(null);
 
   useEffect(() => {
-    // Initialize Amazon IVS Broadcast Client
     const client = IVSBroadcastClient.create({
-      streamConfig: BASIC_LANDSCAPE, // Stream in landscape mode
+      streamConfig: BASIC_LANDSCAPE,
       ingestEndpoint: `rtmps://${state?.ingestUrl}/app/`,
     });
 
     setBroadcastClient(client);
 
-    // Attach preview to the canvas element
     if (canvasRef.current) {
       client.attachPreview(canvasRef.current);
     }
 
-    // Access available devices
     navigator.mediaDevices
       ?.enumerateDevices()
       .then((devices) => {
@@ -47,22 +49,22 @@ const LiveStream = () => {
           (device) => device.kind === 'audioinput'
         );
 
-        // Get user media for the first video and audio device
         navigator.mediaDevices
           .getUserMedia({
             video: { deviceId: videoDevices[0]?.deviceId },
             audio: { deviceId: audioDevices[0]?.deviceId },
           })
           .then((stream) => {
+            videoStream.current = stream;
+            audioStream.current = stream;
             client.addVideoInputDevice(stream, 'camera1', {
-              index: 0, // Position in the composition (z-index)
-              width: 1280, // Width in pixels
-              height: 720, // Height in pixels
-              x: -200, // X position (0 is left)
-              y: 0, // Y position (0 is top)
+              index: 0,
+              width: 1280,
+              height: 720,
+              x: -200,
+              y: 0,
             });
             client.addAudioInputDevice(stream, 'mic1');
-            // console.log('stream', stream);
           })
           .catch((error) =>
             console.error('Error accessing media devices:', error)
@@ -125,6 +127,7 @@ const LiveStream = () => {
         title: 'Live Stopped',
         description: 'Live stopped Successfully',
       });
+      window.location.reload();
     } catch (error) {
       toast({
         title: 'Live error',
@@ -199,6 +202,24 @@ const LiveStream = () => {
     }
   };
 
+  const pauseStream = () => {
+    if (videoStream.current) {
+      videoStream.current
+        .getTracks()
+        .forEach((track) => (track.enabled = !isPaused));
+      setIsPaused((prev) => !prev);
+    }
+  };
+
+  const toggleMute = () => {
+    if (audioStream.current) {
+      audioStream.current
+        .getAudioTracks()
+        .forEach((track) => (track.enabled = !isMuted));
+      setIsMuted((prev) => !prev);
+    }
+  };
+
   return (
     <div className="flex">
       <div className="basis-2/3">
@@ -210,7 +231,7 @@ const LiveStream = () => {
           />
           <div
             onClick={handleFullScreen}
-            className="absolute top-[90%] right-5 cursor-pointer"
+            className="absolute top-[90%] right-5 cursor-pointer bg-white p-2 rounded-full"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -262,17 +283,26 @@ const LiveStream = () => {
             Start Live
           </button>
         ) : (
-          <button
-            onClick={stopStream}
-            style={{
-              padding: '10px',
-              margin: '10px',
-              backgroundColor: 'red',
-              color: 'white',
-            }}
-          >
-            Stop Live
-          </button>
+          <div className="flex gap-3 items-center mt-5">
+            <button
+              onClick={pauseStream}
+              className="px-4 py-2 bg-yellow-500 text-white rounded-lg"
+            >
+              {!isPaused ? 'Resume' : 'Pause'}
+            </button>
+            <button
+              onClick={toggleMute}
+              className="px-4 py-2 bg-gray-500 text-white rounded-lg"
+            >
+              {!isMuted ? 'Unmute' : 'Mute'}
+            </button>
+            <button
+              onClick={stopStream}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg"
+            >
+              Stop Live
+            </button>
+          </div>
         )}
       </div>
       <div className="basis-1/3">
